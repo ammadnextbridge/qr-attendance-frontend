@@ -107,37 +107,7 @@ export default function MainLayout({ children }: Props): JSX.Element {
             {/* Right section with mobile menu and user actions */}
             <div className="flex items-center gap-4">
               {/* Mobile Navigation */}
-              <div className="sm:hidden">
-                <NavigationMenu>
-                  <NavigationMenuList>
-                    <NavigationMenuItem>
-                      <NavigationMenuTrigger className="h-10">
-                        <Menu className="h-4 w-4" />
-                      </NavigationMenuTrigger>
-                      <NavigationMenuContent>
-                        <div className="w-48 p-2">
-                          {user?.role === ROLES.ADMIN &&
-                            navData.map((item) => (
-                              <Link
-                                to={item.path}
-                                key={item.path}
-                                className={cn(
-                                  "flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-colors",
-                                  "hover:bg-primary/10 hover:text-primary",
-                                  isActive(item.path) &&
-                                    "bg-primary/10 text-primary"
-                                )}
-                              >
-                                <User className="h-4 w-4" />
-                                <span>{item.title}</span>
-                              </Link>
-                            ))}
-                        </div>
-                      </NavigationMenuContent>
-                    </NavigationMenuItem>
-                  </NavigationMenuList>
-                </NavigationMenu>
-              </div>
+              
 
               <Bell className="text-primary" />
 
@@ -177,6 +147,37 @@ export default function MainLayout({ children }: Props): JSX.Element {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+              <div className="sm:hidden">
+                <NavigationMenu>
+                  <NavigationMenuList>
+                    <NavigationMenuItem>
+                      <NavigationMenuTrigger className="h-10">
+                        <Menu className="h-4 w-4" />
+                      </NavigationMenuTrigger>
+                      <NavigationMenuContent>
+                        <div className="w-48 p-2">
+                          {user?.role === ROLES.ADMIN &&
+                            navData.map((item) => (
+                              <Link
+                                to={item.path}
+                                key={item.path}
+                                className={cn(
+                                  "flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-colors",
+                                  "hover:bg-primary/10 hover:text-primary",
+                                  isActive(item.path) &&
+                                    "bg-primary/10 text-primary"
+                                )}
+                              >
+                                <User className="h-4 w-4" />
+                                <span>{item.title}</span>
+                              </Link>
+                            ))}
+                        </div>
+                      </NavigationMenuContent>
+                    </NavigationMenuItem>
+                  </NavigationMenuList>
+                </NavigationMenu>
+              </div>
             </div>
           </div>
         </div>

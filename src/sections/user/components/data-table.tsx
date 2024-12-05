@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/table";
 import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
+import axios from "axios";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -63,7 +64,11 @@ export function DataTable<TData, TValue>({
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
   });
-
+  React.useEffect(()=>{
+    const center = async ()=>{
+      // return await axios.get(`http://localhost/8080/center/${data.centerId}`)
+    }
+  })
   return (
     <div className="space-y-4">
       <DataTableToolbar table={table} />

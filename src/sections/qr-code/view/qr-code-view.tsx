@@ -10,6 +10,9 @@ import { useAuthContext } from "@/auth/hooks";
 import { ROLES } from "@/utils/constant";
 import { motion, AnimatePresence } from "framer-motion";
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
+import { useState } from "react";
+
+const centers = ["Lahore", "Islamabad", "Karachi", "Peshawar"];
 
 export default function QRCodeView() {
   const handleFullScreen = useFullScreenHandle();
@@ -17,13 +20,15 @@ export default function QRCodeView() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  const [selectedCenter, setSelectedCenter] = useState(centers[0]);
+
   const { data: qrData, isLoading } = useQuery({
-    queryKey: ["currentQR"],
-    queryFn: qrService.getCurrentQR,
+    queryKey: ["currentQR", selectedCenter],
+    queryFn: () => qrService.getCurrentQR(selectedCenter), // Pass the center to the service
   });
 
   const generateMutation = useMutation({
-    mutationFn: qrService.generateNewQR,
+    mutationFn: () => qrService.generateNewQR(selectedCenter), // Pass the center to the service
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["currentQR"] });
       toast({
@@ -44,7 +49,7 @@ export default function QRCodeView() {
     <div className="min-h-[calc(100vh-16rem)] flex items-center justify-center bg-gradient-to-b from-background to-muted/20">
       <FullScreen
         handle={handleFullScreen}
-        className="min-h-[calc(100vh-16rem)] flex items-center justify-center "
+        className="min-h-[calc(100vh-16rem)] flex items-center justify-center"
       >
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -52,11 +57,26 @@ export default function QRCodeView() {
           transition={{ duration: 0.5 }}
           className="w-full max-w-md"
         >
+           {/* Center Selector */}
+              <div className="mt-4 mb-2">
+              <select
+                  className="w-full p-2 border-2 border-gray-300 rounded-lg bg-gray-50 text-gray-700 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 ease-in-out"
+                  value={selectedCenter}
+                  onChange={(e) => setSelectedCenter(e.target.value)}
+                >
+                  {centers.map((center) => (
+                    <option key={center} value={center}>
+                      {center}
+                    </option>
+                  ))}
+                </select>
+              </div>
           <Card className="border-2">
             <CardHeader className="p-4">
               <CardTitle className="text-lg font-bold text-center">
                 Scan QR Code for Attendance
               </CardTitle>
+             
             </CardHeader>
             <CardContent>
               <AnimatePresence mode="wait">
@@ -146,7 +166,7 @@ export default function QRCodeView() {
                   >
                     <div className="bg-muted/50 rounded-lg p-8 space-y-4">
                       <p className="text-muted-foreground">
-                        No QR code available for today
+                        No QR code available for {selectedCenter} today
                       </p>
                       {user?.role === ROLES.ADMIN && (
                         <Button

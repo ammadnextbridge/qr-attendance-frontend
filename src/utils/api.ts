@@ -50,4 +50,8 @@ export const endpoints = {
     current: "/qr/current",
     create: "/qr/generate",
   },
+  center: {
+    root: "/centers", // Endpoint for getting all centers and creating new centers
+    update: (centerId: string) => `/centers/${centerId}`, // Endpoint for updating a center
+  },
 };

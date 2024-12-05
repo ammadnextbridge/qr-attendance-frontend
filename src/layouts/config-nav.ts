@@ -6,7 +6,7 @@ export const navData = [
     path: paths.dashboard.root,
   },
   {
-    title: "Scan QR",
+    title: "Scan QR ",
     path: paths.dashboard.scanQR,
   },
   {
