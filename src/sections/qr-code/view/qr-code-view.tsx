@@ -10,7 +10,7 @@ import { useAuthContext } from "@/auth/hooks";
 import { ROLES } from "@/utils/constant";
 import { motion, AnimatePresence } from "framer-motion";
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
-import { useState,useEffect } from "react";
+import { useState } from "react";
 
 const centers = ["Lahore", "Islamabad", "Karachi", "Peshawar"];
 
@@ -23,12 +23,12 @@ export default function QRCodeView() {
   const [selectedCenter, setSelectedCenter] = useState(centers[0]);
 
   const { data: qrData, isLoading } = useQuery({
-    queryKey: ["currentQR"],
-    queryFn: qrService.getCurrentQR,
+    queryKey: ["currentQR", selectedCenter],
+    queryFn: () => qrService.getCurrentQR(selectedCenter), // Pass the center to the service
   });
 
   const generateMutation = useMutation({
-    mutationFn: qrService.generateNewQR,
+    mutationFn: () => qrService.generateNewQR(selectedCenter), // Pass the center to the service
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["currentQR"] });
       toast({
@@ -44,19 +44,6 @@ export default function QRCodeView() {
       });
     },
   });
-  const generateMutationCenterChange = useMutation({
-    mutationFn: qrService.generateNewQR,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["currentQR"] });
-   
-    },
-   
-  });
-  useEffect(() => {
-    if (selectedCenter) {
-      generateMutationCenterChange.mutate();
-    }
-  }, [selectedCenter]);
 
   return (
     <div className="min-h-[calc(100vh-16rem)] flex items-center justify-center bg-gradient-to-b from-background to-muted/20">

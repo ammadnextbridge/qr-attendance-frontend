@@ -30,6 +30,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { useGetAllCenters } from "@/services/center.service";
 
 //----------------------------------------------------------------
 
@@ -39,6 +40,8 @@ const registerSchema = z.object({
     .min(2, "Name must be at least 2 characters")
     .max(50, "Name must be less than 50 characters"),
   email: z.string().email("Invalid email address"),
+  centerId: z
+    .string(),
   password: z
     .string()
     .min(8, "Password must be at least 8 characters")
@@ -72,8 +75,10 @@ export default function UserNewEditForm({ open, onClose }: Props) {
       email: "",
       password: "",
       role: "user",
+      centerId: "",
     },
   });
+  const { centers, isLoadingCenters, refetchCenters } = useGetAllCenters();
 
   const { control, handleSubmit } = methods;
 
@@ -138,6 +143,29 @@ export default function UserNewEditForm({ open, onClose }: Props) {
                 </FormItem>
               )}
             />
+
+
+            <FormField
+              control={control}
+              name="centerId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Select Center</FormLabel>
+                  <FormControl>
+                    <select {...field} value={field.value} className="form-select p-4 block w-full">
+                      <option value="">Select Center</option>
+                      {centers?.map((center) => (
+                        <option key={center.id} value={center.id}>
+                          {center.name}
+                        </option>
+                      ))}
+                    </select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
 
             <FormField
               control={control}

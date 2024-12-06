@@ -13,6 +13,7 @@ interface CreateUserPayload {
   email: string;
   password: string;
   role: string;
+  centerId: string
 }
 
 export const userService = {

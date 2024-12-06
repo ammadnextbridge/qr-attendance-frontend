@@ -19,6 +19,10 @@ import { motion } from "framer-motion";
 import { useCreateUser } from "@/services/user.service";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "@/routes/hooks";
+import { useState } from "react";
+import { useGetAllCenters } from "@/services/center.service";
+import { Center } from '@/types/center';
+// const centers = [{id:0,name:"All"},{id:1, name:"Lahore"}, {id:2,name:"Islamabad"}, {id:3,name:"Karachi"}];
 
 //----------------------------------------------------------------
 const signUpSchema = z.object({
@@ -27,6 +31,8 @@ const signUpSchema = z.object({
     .string()
     .min(1, { message: "Email is required!" })
     .email({ message: "Email must be a valid email address!" }),
+  centerId: z
+    .string(),
   password: z
     .string()
     .min(1, { message: "Password is required!" })
@@ -47,7 +53,9 @@ export function SignUpView() {
   const defaultValues = {
     name: "",
     email: "",
+    centerId: "",
     password: "",
+
   };
 
   const methods = useForm<SignUpSchema>({
@@ -73,10 +81,19 @@ export function SignUpView() {
   };
 
   const onSubmit = handleSubmit((values) => {
-    const payload = { ...values, role: "user" };
-
+    console.log(values)
+    const payload = { ...values, centerId: values.centerId, role: "user" };
+    console.log(payload)
     createUser(payload, { onSuccess, onError });
   });
+
+
+  const [data, setData] = useState<Center[]>([]); // State to store fetched data
+
+  const { centers, isLoadingCenters, refetchCenters } = useGetAllCenters();
+  // setData(centers)
+  // console.log(centers)
+  console.log(centers)
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50/50 p-2">
       <motion.div
@@ -171,6 +188,38 @@ export function SignUpView() {
                     </FormItem>
                   )}
                 />
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                {isLoadingCenters ? (
+                  <div>Loading centers...</div>
+                ) : (
+                  <FormField
+                    control={control}
+                    name="centerId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Select Center</FormLabel>
+                        <FormControl>
+                          <select {...field} value={field.value} className="form-select p-4 block w-full">
+                            <option value="">Select Center</option>
+                            {centers.map((center) => (
+                              <option key={center.id} value={center.id}>
+                                {center.name}
+                              </option>
+                            ))}
+                          </select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+
               </motion.div>
 
               <motion.div

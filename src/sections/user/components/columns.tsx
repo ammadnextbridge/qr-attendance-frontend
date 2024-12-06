@@ -6,7 +6,7 @@ import { IUser } from "@/types/user";
 import { DataTableColumnHeader } from "./data-table-column-header";
 import { DataTableRowActions } from "./data-table-row-actions";
 import { fDate } from "@/utils/format-time";
-
+import { Center } from "@/types/user";
 export const columns: ColumnDef<IUser>[] = [
   {
     accessorKey: "name",
@@ -34,6 +34,16 @@ export const columns: ColumnDef<IUser>[] = [
     ),
     cell: ({ row }) => <div>{fDate(row.getValue("createdAt"))}</div>,
   },
+  {
+    accessorKey: "center",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Center" />
+    ),
+    cell: ({ row }) => {
+      const center = row.getValue("center") as Center; // Assert the type as Center
+      return <div>{center?.name}</div>;
+    },
+      },
   {
     accessorKey: "status",
     header: ({ column }) => (
@@ -64,4 +74,6 @@ export const columns: ColumnDef<IUser>[] = [
     id: "actions",
     cell: ({ row }) => <DataTableRowActions row={row} />,
   },
+
+  
 ];

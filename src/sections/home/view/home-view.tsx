@@ -15,20 +15,21 @@ import {
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGetAttendance } from "@/services/attendance.service";
-import { Users, UserCheck, Clock, Mail, User, Search, LocateIcon } from "lucide-react"
+import { Users, UserCheck, Clock, Mail, User, Search, LocateIcon } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { cardVariants, containerVariants } from "@/animations/variants";
 import { motion } from "framer-motion";
 import { useGetActiveUsers } from "@/services/user.service";
 import { useState } from "react";
+import { useGetAllCenters } from "@/services/center.service";
 
 export default function HomeView() {
   const { records, meta, isLoading } = useGetAttendance();
   const { activeUsers } = useGetActiveUsers();
   const [selectedCenter, setSelectedCenter] = useState("All");
-
+  console.log(records)
   // List of centers (this could be fetched dynamically if needed)
-  const centers = ["All", "Lahore", "Islamabad", "Karachi"];
+  // const { centers, isLoadingCenters, refetchCenters } = useGetAllCenters();
 
   const totalPresent = meta?.total ?? 0;
   const totalExpected = activeUsers.length;
@@ -137,7 +138,7 @@ export default function HomeView() {
               {isLoading ? (
                 <Skeleton className="h-8 w-16" />
               ) : (
-                <div className="space-y-2">Center
+                <div className="space-y-2">
                   <div className="flex items-baseline space-x-2">
                     <span className="text-3xl font-bold">
                       {attendanceRate}%
@@ -179,18 +180,18 @@ export default function HomeView() {
     <Search className="absolute top-1/2 left-[610px] h-4 text-gray-400 transform -translate-y-1/2" />
   </div>
 
-  {/* Center Dropdown */}
+  {/* Center Dropdown
   <select
     className="w-1/3  p-2 border-2 border-gray-300 rounded-lg bg-gray-50 text-gray-700 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 ease-in-out"
     value={selectedCenter}
     onChange={(e) => setSelectedCenter(e.target.value)}
   >
     {centers.map((center) => (
-      <option key={center} value={center}>
-        {center}
+      <option key={center.id} value={center.name}>
+        {center.name}
       </option>
     ))}
-  </select>
+  </select> */}
 </div>
 
 
@@ -248,8 +249,8 @@ export default function HomeView() {
                           minute: "2-digit",
                         })}
                       </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        Lahore
+                      <TableCell>
+                        {/* {record.user} */}
                       </TableCell>
                     </TableRow>
                   ))}

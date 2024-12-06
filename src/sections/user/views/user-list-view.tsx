@@ -42,7 +42,6 @@ export default function UserListView() {
     queryKey: ["users"],
     queryFn: userService.getAllUsers,
   });
-
   const showSpinner = isLoading || isRefetching || !users;
 
   const totalUsers = users?.length ?? 0;
@@ -89,7 +88,7 @@ export default function UserListView() {
       icon: <UserRoundX className="text-destructive" />,
     },
   ];
-
+  console.log(users)
   return (
     <motion.div
       variants={containerVariants}
