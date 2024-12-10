@@ -28,14 +28,16 @@ export default function QRCodeView() {
 
   const { data: qrData, isLoading: loadingQR } = useQuery({
     queryKey: ["currentQR", selectedCenter],
-    queryFn: () => qrService.getCurrentQR(selectedCenter), // Pass the selected center
+    queryFn: () => qrService.getCurrentQR(selectedCenter), // Pass the selected center as parameter
     enabled: !!selectedCenter, // Ensure query runs only when a center is selected
   });
+  
 
   const generateMutation = useMutation({
     mutationFn: () => qrService.generateNewQR(selectedCenter), // Pass the selected center
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["currentQR"] });
+      // Refetch the current QR code
+      queryClient.refetchQueries({ queryKey: ["currentQR", selectedCenter] });
       toast({
         title: "Success",
         description: "New QR code generated successfully",
@@ -49,6 +51,7 @@ export default function QRCodeView() {
       });
     },
   });
+  
 
   return (
     <div className="min-h-[calc(100vh-16rem)] flex items-center justify-center bg-gradient-to-b from-background to-muted/20">
@@ -76,7 +79,7 @@ export default function QRCodeView() {
                   Select a Center
                 </option>
                 {centers?.map((center) => (
-                  <option key={center.id} value={center.name}>
+                  <option key={center.id} value={center.id}> {/* Pass the center ID instead of the name */}
                     {center.name}
                   </option>
                 ))}
