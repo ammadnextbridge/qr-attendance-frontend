@@ -17,4 +17,9 @@ export const qrService = {
     const { data } = await api.post<QRCode>(endpoints.qrCode.create);
     return data;
   },
+  GetAllCenters: async()=>{
+    const { data } = await api.get<QRCode>(endpoints.qrCode.allCenters);
+    return data;
+
+  }
 };

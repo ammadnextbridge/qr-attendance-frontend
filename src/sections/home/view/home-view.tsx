@@ -15,7 +15,15 @@ import {
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGetAttendance } from "@/services/attendance.service";
-import { Users, UserCheck, Clock, Mail, User, Search, LocateIcon } from "lucide-react";
+import {
+  Users,
+  UserCheck,
+  Clock,
+  Mail,
+  User,
+  Search,
+  LocateIcon,
+} from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { cardVariants, containerVariants } from "@/animations/variants";
 import { motion } from "framer-motion";
@@ -27,9 +35,10 @@ export default function HomeView() {
   const { records, meta, isLoading } = useGetAttendance();
   const { activeUsers } = useGetActiveUsers();
   const [selectedCenter, setSelectedCenter] = useState("All");
-  console.log(records)
+  console.log(records);
+
   // List of centers (this could be fetched dynamically if needed)
-  // const { centers, isLoadingCenters, refetchCenters } = useGetAllCenters();
+  const { centers, isLoadingCenters, refetchCenters } = useGetAllCenters();
 
   const totalPresent = meta?.total ?? 0;
   const totalExpected = activeUsers.length;
@@ -38,11 +47,18 @@ export default function HomeView() {
     : 0;
 
   const [filter, setFilter] = useState("");
-  const filteredRecords = records?.filter(
-    (record) =>
+
+  // Filter records based on both the search input and the selected center
+  const filteredRecords = records?.filter((record) => {
+    const matchesFilter =
       record.user.name.toLowerCase().includes(filter.toLowerCase()) ||
-      record.user.email.toLowerCase().includes(filter.toLowerCase())
-  );
+      record.user.email.toLowerCase().includes(filter.toLowerCase());
+
+    const matchesCenter =
+      selectedCenter === "All" || record.user?.center.name === selectedCenter;
+
+    return matchesFilter && matchesCenter;
+  });
 
   return (
     <motion.div
@@ -168,33 +184,31 @@ export default function HomeView() {
             <Clock className="h-5 w-5 text-muted-foreground" />
           </div>
           <div className="flex items-center justify-between space-x-4 mt-4">
-  {/* Search Input */}
-  <div className="w-full relative  flex row-auto justify-between">
-    <input
-      type="text"
-      placeholder="Search by name or email"
-      value={filter}
-      onChange={(e) => setFilter(e.target.value)}
-      className="w-2/3 p-2 border rounded-md text-sm text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-    />
-    <Search className="absolute top-1/2 left-[610px] h-4 text-gray-400 transform -translate-y-1/2" />
-  </div>
+            {/* Search Input */}
+            <div className="w-full relative flex row-auto justify-between">
+              <input
+                type="text"
+                placeholder="Search by name or email"
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+                className="w-2/3 p-2 border rounded-md text-sm text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+              <Search className="absolute top-1/2 left-[610px] h-4 text-gray-400 transform -translate-y-1/2" />
+            </div>
 
-  {/* Center Dropdown
-  <select
-    className="w-1/3  p-2 border-2 border-gray-300 rounded-lg bg-gray-50 text-gray-700 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 ease-in-out"
-    value={selectedCenter}
-    onChange={(e) => setSelectedCenter(e.target.value)}
-  >
-    {centers.map((center) => (
-      <option key={center.id} value={center.name}>
-        {center.name}
-      </option>
-    ))}
-  </select> */}
-</div>
-
-
+            <select
+              className="w-1/3 p-2 border-2 border-gray-300 rounded-lg bg-gray-50 text-gray-700 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 ease-in-out"
+              value={selectedCenter}
+              onChange={(e) => setSelectedCenter(e.target.value)}
+            >
+              <option value="All">All Centers</option>
+              {centers.map((center) => (
+                <option key={center.id} value={center.name}>
+                  {center.name}
+                </option>
+              ))}
+            </select>
+          </div>
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -228,32 +242,33 @@ export default function HomeView() {
                     </TableHead>
                     <TableHead>
                       <div className="flex items-center space-x-2">
-                      <LocateIcon className="h-4 w-4" />
+                        <LocateIcon className="h-4 w-4" />
                         <span>Center</span>
                       </div>
                     </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredRecords?.map((record) => (
-                    <TableRow key={record.id} className="hover:bg-muted/50">
-                      <TableCell className="font-medium">
-                        {record.user.name}
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {record.user.email}
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {new Date(record.markedAt).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </TableCell>
-                      <TableCell>
-                        {/* {record.user} */}
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {filteredRecords?.map((record) => {
+                    console.log("Record:", record); // Logs each record
+                    return (
+                      <TableRow key={record.id} className="hover:bg-muted/50">
+                        <TableCell className="font-medium">
+                          {record.user.name}
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {record.user.email}
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {new Date(record.markedAt).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </TableCell>
+                        <TableCell>{record.user?.center.name}</TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </div>

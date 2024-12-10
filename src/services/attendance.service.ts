@@ -7,11 +7,15 @@ interface AttendanceRecord {
     id: string;
     name: string;
     email: string;
+    center: Center;
   };
   markedAt: string;
   qrToken: string;
 }
 
+interface Center {
+  name: string;
+}
 export const attendanceService = {
   getRecords: api
     .get<GetAttendenceRecordsResponse>("/attendance")

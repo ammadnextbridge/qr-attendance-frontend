@@ -2,7 +2,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "react-router-dom";
-import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, User, Phone } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -21,7 +21,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "@/routes/hooks";
 import { useState } from "react";
 import { useGetAllCenters } from "@/services/center.service";
-import { Center } from '@/types/center';
+import { Center } from "@/types/center";
 // const centers = [{id:0,name:"All"},{id:1, name:"Lahore"}, {id:2,name:"Islamabad"}, {id:3,name:"Karachi"}];
 
 //----------------------------------------------------------------
@@ -31,8 +31,8 @@ const signUpSchema = z.object({
     .string()
     .min(1, { message: "Email is required!" })
     .email({ message: "Email must be a valid email address!" }),
-  centerId: z
-    .string(),
+  centerId: z.string(),
+  phoneNumber: z.string(),
   password: z
     .string()
     .min(1, { message: "Password is required!" })
@@ -55,7 +55,6 @@ export function SignUpView() {
     email: "",
     centerId: "",
     password: "",
-
   };
 
   const methods = useForm<SignUpSchema>({
@@ -81,19 +80,13 @@ export function SignUpView() {
   };
 
   const onSubmit = handleSubmit((values) => {
-    console.log(values)
     const payload = { ...values, centerId: values.centerId, role: "user" };
-    console.log(payload)
     createUser(payload, { onSuccess, onError });
   });
-
 
   const [data, setData] = useState<Center[]>([]); // State to store fetched data
 
   const { centers, isLoadingCenters, refetchCenters } = useGetAllCenters();
-  // setData(centers)
-  // console.log(centers)
-  console.log(centers)
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50/50 p-2">
       <motion.div
@@ -189,6 +182,33 @@ export function SignUpView() {
                   )}
                 />
               </motion.div>
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3 }}
+              >
+                <FormField
+                  control={control}
+                  name="phoneNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Phone Number</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                          <Input
+                            type="tel"
+                            placeholder="Enter your phone number"
+                            className="pl-10"
+                            {...field}
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </motion.div>
 
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
@@ -205,7 +225,11 @@ export function SignUpView() {
                       <FormItem>
                         <FormLabel>Select Center</FormLabel>
                         <FormControl>
-                          <select {...field} value={field.value} className="form-select p-4 block w-full">
+                          <select
+                            {...field}
+                            value={field.value}
+                            className="form-select p-3 bg-white block w-full border rounded text-muted-foreground"
+                          >
                             <option value="">Select Center</option>
                             {centers.map((center) => (
                               <option key={center.id} value={center.id}>
@@ -219,7 +243,6 @@ export function SignUpView() {
                     )}
                   />
                 )}
-
               </motion.div>
 
               <motion.div

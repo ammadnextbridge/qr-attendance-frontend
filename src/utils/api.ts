@@ -48,6 +48,7 @@ export const endpoints = {
   },
   qrCode: {
     current: "/qr/current",
+    allCenters: '/centers',
     create: "/qr/generate",
   },
   center: {

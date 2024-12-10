@@ -12,23 +12,28 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
 import { useState } from "react";
 
-const centers = ["Lahore", "Islamabad", "Karachi", "Peshawar"];
-
 export default function QRCodeView() {
   const handleFullScreen = useFullScreenHandle();
   const { user } = useAuthContext();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const [selectedCenter, setSelectedCenter] = useState(centers[0]);
+  // Fetch centers dynamically
+  const { data: centers, isLoading: loadingCenters } = useQuery({
+    queryKey: ["centers"],
+    queryFn: qrService.GetAllCenters, // Fetch centers from the service
+  });
 
-  const { data: qrData, isLoading } = useQuery({
+  const [selectedCenter, setSelectedCenter] = useState("");
+
+  const { data: qrData, isLoading: loadingQR } = useQuery({
     queryKey: ["currentQR", selectedCenter],
-    queryFn: () => qrService.getCurrentQR(selectedCenter), // Pass the center to the service
+    queryFn: () => qrService.getCurrentQR(selectedCenter), // Pass the selected center
+    enabled: !!selectedCenter, // Ensure query runs only when a center is selected
   });
 
   const generateMutation = useMutation({
-    mutationFn: () => qrService.generateNewQR(selectedCenter), // Pass the center to the service
+    mutationFn: () => qrService.generateNewQR(selectedCenter), // Pass the selected center
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["currentQR"] });
       toast({
@@ -57,30 +62,36 @@ export default function QRCodeView() {
           transition={{ duration: 0.5 }}
           className="w-full max-w-md"
         >
-           {/* Center Selector */}
-              <div className="mt-4 mb-2">
+          {/* Center Selector */}
+          <div className="mt-4 mb-2">
+            {loadingCenters ? (
+              <Skeleton className="h-10 w-full" />
+            ) : (
               <select
-                  className="w-full p-2 border-2 border-gray-300 rounded-lg bg-gray-50 text-gray-700 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 ease-in-out"
-                  value={selectedCenter}
-                  onChange={(e) => setSelectedCenter(e.target.value)}
-                >
-                  {centers.map((center) => (
-                    <option key={center} value={center}>
-                      {center}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                className="w-full p-2 border-2 border-gray-300 rounded-lg bg-gray-50 text-gray-700 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 ease-in-out"
+                value={selectedCenter}
+                onChange={(e) => setSelectedCenter(e.target.value)}
+              >
+                <option value="" disabled>
+                  Select a Center
+                </option>
+                {centers?.map((center) => (
+                  <option key={center.id} value={center.name}>
+                    {center.name}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
           <Card className="border-2">
             <CardHeader className="p-4">
               <CardTitle className="text-lg font-bold text-center">
                 Scan QR Code for Attendance
               </CardTitle>
-             
             </CardHeader>
             <CardContent>
               <AnimatePresence mode="wait">
-                {isLoading || generateMutation.isPending ? (
+                {loadingQR || generateMutation.isPending ? (
                   <motion.div
                     key="loading"
                     initial={{ opacity: 0 }}
