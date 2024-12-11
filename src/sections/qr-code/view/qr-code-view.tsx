@@ -11,7 +11,7 @@ import { ROLES } from "@/utils/constant";
 import { motion, AnimatePresence } from "framer-motion";
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
 import { useState } from "react";
-
+import { useGetAllCenters } from "@/services/center.service";
 export default function QRCodeView() {
   const handleFullScreen = useFullScreenHandle();
   const { user } = useAuthContext();
@@ -19,10 +19,8 @@ export default function QRCodeView() {
   const queryClient = useQueryClient();
 
   // Fetch centers dynamically
-  const { data: centers, isLoading: loadingCenters } = useQuery({
-    queryKey: ["centers"],
-    queryFn: qrService.GetAllCenters, // Fetch centers from the service
-  });
+  const { centers, isLoadingCenters } = useGetAllCenters();
+
 
   const [selectedCenter, setSelectedCenter] = useState("");
 
@@ -34,7 +32,7 @@ export default function QRCodeView() {
   
 
   const generateMutation = useMutation({
-    mutationFn: () => qrService.generateNewQR(selectedCenter), // Pass the selected center
+    mutationFn: () => qrService.generateNewQR(selectedCenter),
     onSuccess: () => {
       // Refetch the current QR code
       queryClient.refetchQueries({ queryKey: ["currentQR", selectedCenter] });
@@ -67,7 +65,7 @@ export default function QRCodeView() {
         >
           {/* Center Selector */}
           <div className="mt-4 mb-2">
-            {loadingCenters ? (
+            {isLoadingCenters ? (
               <Skeleton className="h-10 w-full" />
             ) : (
               <select

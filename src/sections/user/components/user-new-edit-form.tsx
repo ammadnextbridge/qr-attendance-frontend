@@ -78,7 +78,7 @@ export default function UserNewEditForm({ open, onClose }: Props) {
       centerId: "",
     },
   });
-  const { centers, isLoadingCenters, refetchCenters } = useGetAllCenters();
+  const { centers } = useGetAllCenters();
 
   const { control, handleSubmit } = methods;
 

@@ -38,7 +38,7 @@ export default function HomeView() {
   console.log(records);
 
   // List of centers (this could be fetched dynamically if needed)
-  const { centers, isLoadingCenters, refetchCenters } = useGetAllCenters();
+  const { centers } = useGetAllCenters();
 
   const totalPresent = meta?.total ?? 0;
   const totalExpected = activeUsers.length;

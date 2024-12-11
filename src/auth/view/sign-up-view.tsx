@@ -19,9 +19,7 @@ import { motion } from "framer-motion";
 import { useCreateUser } from "@/services/user.service";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "@/routes/hooks";
-import { useState } from "react";
 import { useGetAllCenters } from "@/services/center.service";
-import { Center } from "@/types/center";
 // const centers = [{id:0,name:"All"},{id:1, name:"Lahore"}, {id:2,name:"Islamabad"}, {id:3,name:"Karachi"}];
 
 //----------------------------------------------------------------
@@ -84,9 +82,8 @@ export function SignUpView() {
     createUser(payload, { onSuccess, onError });
   });
 
-  const [data, setData] = useState<Center[]>([]); // State to store fetched data
 
-  const { centers, isLoadingCenters, refetchCenters } = useGetAllCenters();
+  const { centers, isLoadingCenters } = useGetAllCenters();
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50/50 p-2">
       <motion.div
